@@ -1,0 +1,84 @@
+# ─────────────────────────────────────────────────────────────
+# Linkly — monorepo .gitignore (Java/Spring Boot + Node/Next.js)
+# ─────────────────────────────────────────────────────────────
+
+# ---------- Java / Spring Boot ----------
+target/
+build/
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+replay_pid*
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# ---------- Node / Next.js ----------
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+coverage/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# ---------- Environment / secrets ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ---------- Terraform / infra ----------
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
+# ---------- Docker ----------
+# (compose files are tracked; local volumes/data are not)
+**/data/
+*.pid
+
+# ---------- IDEs / editors ----------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Logs / tmp ----------
+logs/
+*.log
+tmp/
+temp/
