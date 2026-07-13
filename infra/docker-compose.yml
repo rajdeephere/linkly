@@ -1,0 +1,82 @@
+# ─────────────────────────────────────────────────────────────
+# Linkly — local development dependencies
+#   docker compose -f infra/docker-compose.yml up -d
+#
+# Brings up the backing services the API + resolver need locally:
+#   Postgres (metadata) · Redis (cache/KGS pool) · ClickHouse (clicks)
+#   Kafka + Kafka UI (click-event stream)
+# Application services (Spring Boot api/resolver, Next.js web) run on the
+# host during development; add them here once containerized.
+# ─────────────────────────────────────────────────────────────
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: linkly-postgres
+    environment:
+      POSTGRES_USER: linkly
+      POSTGRES_PASSWORD: linkly
+      POSTGRES_DB: linkly
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U linkly"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: linkly-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24-alpine
+    container_name: linkly-clickhouse
+    environment:
+      CLICKHOUSE_USER: linkly
+      CLICKHOUSE_PASSWORD: linkly
+      CLICKHOUSE_DB: linkly
+    ports:
+      - "8123:8123"   # HTTP
+      - "9000:9000"   # native
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ./data/clickhouse:/var/lib/clickhouse
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: linkly-kafka
+    environment:
+      # KRaft mode (no ZooKeeper)
+      KAFKA_CFG_NODE_ID: "1"
+      KAFKA_CFG_PROCESS_ROLES: "controller,broker"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    ports:
+      - "9092:9092"
+    volumes:
+      - ./data/kafka:/bitnami/kafka
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: linkly-kafka-ui
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    ports:
+      - "8080:8080"
