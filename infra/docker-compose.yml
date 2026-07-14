@@ -17,7 +17,8 @@ services:
       POSTGRES_PASSWORD: linkly
       POSTGRES_DB: linkly
     ports:
-      - "5432:5432"
+      # Host 5433 (not 5432) so the stack coexists with a native Postgres install.
+      - "5433:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     healthcheck:

@@ -103,7 +103,7 @@ Local services once up:
 
 | Service | URL |
 |---|---|
-| Postgres | `localhost:5432` |
+| Postgres | `localhost:5433` |
 | Redis | `localhost:6379` |
 | ClickHouse | `localhost:8123` (HTTP) |
 | Kafka | `localhost:9092` |
