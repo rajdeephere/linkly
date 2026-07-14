@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: linkly-api
+
+  datasource:
+    # Host port 5433 (see infra/docker-compose.yml) avoids clashing with a native Postgres on 5432.
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5433/linkly}
+    username: ${POSTGRES_USER:linkly}
+    password: ${POSTGRES_PASSWORD:linkly}
+
+  jpa:
+    hibernate:
+      # Flyway owns the schema; Hibernate only validates the entities match it.
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+server:
+  # 8081 keeps clear of Kafka UI (8080) and the Next.js web app (3000)
+  port: 8081
