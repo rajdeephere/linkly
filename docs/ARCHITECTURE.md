@@ -423,4 +423,5 @@ Each is a defensible decision with a real trade-off. *(Mirrors §7 of the projec
 | **ADR-10** | Smart **routing rules evaluated at resolve time**, A-B with **sticky bucketing** | Rules must run on the hot path near-zero-latency; A-B without sticky buckets corrupts the experiment | Rule logic duplicated edge+origin (see ADR-3); geo accuracy depends on edge provider |
 | **ADR-11** | **Next.js App Router** frontend on Vercel, decoupled from the resolver | Sets the modern SaaS aesthetic bar; server components; cheap edge hosting for link-in-bio; shows full-stack range | Second ecosystem (TS); auth spans NextAuth session ↔ API JWT |
 
-> Full narrative form (alternatives considered, "revisit if" triggers) lives in the project spec, §7, in the `random-thoughts` repo.
+> Full narrative form — Context · Decision · Consequences · Alternatives · Revisit-if — lives one file
+> per ADR in [`adr/`](./adr/).
