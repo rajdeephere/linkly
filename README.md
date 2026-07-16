@@ -25,6 +25,7 @@ Linkly turns long URLs into short, branded, trackable links — and resolves the
 
 ## ✨ Features
 
+
 **Core**
 - Shorten any URL → short code, with optional **custom aliases**
 - **Fast global redirects** (hybrid edge cache + origin), default `302` for editability + analytics
