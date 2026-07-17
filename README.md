@@ -80,7 +80,11 @@ linkly/
 │   ├── edge/         # Edge worker — global KV resolve + async click event
 │   └── web/          # Next.js — dashboard, analytics, link-in-bio
 ├── infra/            # docker-compose (local), Terraform (cloud)
-├── docs/             # ARCHITECTURE.md, ROADMAP.md
+├── docs/             # engineering docs — start at docs/README.md
+│   ├── ARCHITECTURE.md, ROADMAP.md, data-model.md, wire-protocol.md, DEPLOYMENT-ARCHITECTURE.md
+│   ├── adr/                          # 12 Architecture Decision Records
+│   ├── requirement-execution-plan/   # phased plan (what/why)
+│   └── step-by-step-implementation/  # build + deploy runbooks
 └── README.md
 ```
 
@@ -116,7 +120,13 @@ A phased, day-by-day build plan (correctness → analytics → scale → platfor
 
 ## 📚 Documentation
 
-- [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — diagrams + Architecture Decision Records (ADRs)
+Start at the docs hub → [`docs/README.md`](./docs/README.md). Highlights:
+
+- [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — 11 diagrams + architecture overview
+- [`docs/adr/`](./docs/adr/) — 12 Architecture Decision Records (every load-bearing decision + its trade-off)
+- [`docs/requirement-execution-plan/`](./docs/requirement-execution-plan/) — phased what/why (Goal · Scope · Done-when)
+- [`docs/step-by-step-implementation/`](./docs/step-by-step-implementation/) — build + deploy runbooks
+- [`docs/data-model.md`](./docs/data-model.md) · [`docs/wire-protocol.md`](./docs/wire-protocol.md) · [`docs/DEPLOYMENT-ARCHITECTURE.md`](./docs/DEPLOYMENT-ARCHITECTURE.md)
 - [`docs/ROADMAP.md`](./docs/ROADMAP.md) — day-by-day build roadmap
 
 ## 📄 License
