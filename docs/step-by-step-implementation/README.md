@@ -18,7 +18,7 @@ filled in as we go (no speculative guesswork).
 
 **Implementation track**
 - [x] [01 — Day 1: monorepo scaffold + domain + boots-green](./implementation/01-day1-scaffold.md) ✅ full
-- [ ] 02 — Day 2: shorten + 302 resolve + shorten bar — outlined
+- [x] [02 — Day 2: shorten + 302 resolve + shorten bar](./implementation/02-day2-shorten-resolve.md) ✅ full
 - [ ] 03 — Day 3: KGS non-enumerable codes — outlined
 - [ ] 04 — Day 4: aliases, expiry, Safe-Browsing, rate limit — outlined
 - [ ] 05 — Day 5: edit/delete + Redis cache-aside + invalidation — outlined

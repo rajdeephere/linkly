@@ -12,7 +12,7 @@ in cache-invalidation bugs. Phases 0–1 are the *real* project; the rest is dep
 
 | Phase | Theme | Demoable outcome | Roadmap days | Status |
 |-------|-------|------------------|--------------|--------|
-| [00](./00-correct-safe-shortener.md) | Correct, safe shortener on one service | non-enumerable codes, edit reflected instantly, bad URLs rejected | 1–5 | 🔨 in progress (Day 1 ✅) |
+| [00](./00-correct-safe-shortener.md) | Correct, safe shortener on one service | non-enumerable codes, edit reflected instantly, bad URLs rejected | 1–5 | 🔨 in progress (Days 1–2 ✅) |
 | [01](./01-analytics-pipeline.md) | Analytics off the hot path | consumer down → redirects still work; map + time-series dashboard | 6–7 | ⬜ next |
 | [02](./02-read-hot-path-at-scale.md) | Read hot path at scale ⭐ | hot link <10ms from the edge; 100k req/s load test | 8–9 | ⬜ |
 | [03](./03-domains-qr-routing.md) | Branded domains + QR + smart routing | `go.acme.com` over HTTPS; geo/device split; durable QR | 10–11 | ⬜ |

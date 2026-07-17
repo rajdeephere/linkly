@@ -1,6 +1,6 @@
 # Phase 00 — Correct, safe shortener on one service
 
-**Status:** 🔨 in progress (Day 1 ✅ done) · **Roadmap:** Days 1–5
+**Status:** 🔨 in progress (Days 1–2 ✅ done) · **Roadmap:** Days 1–5
 
 ## Goal
 A **correct, safe, editable** shortener running on a **single** service: shorten → resolve (302),
@@ -26,7 +26,7 @@ Flyway-owned schema ([ADR-0012](../adr/0012-flyway-schema.md)); 302 not 301
 ## Done when
 - [x] **Day 1:** monorepo scaffolded; `Workspace`/`User`/`Link` + Flyway V1; app boots green; `/ping`
       returns `seededLinks: 1`; `/actuator/health` UP; web builds.
-- [ ] **Day 2:** `POST /v1/links` → code; `GET /{code}` → 302 to destination; shorten bar + copy.
+- [x] **Day 2:** `POST /v1/links` → code; `GET /{code}` → 302 to destination; shorten bar + copy.
 - [ ] **Day 3:** KGS base62 codes — unique, non-sequential; an enumeration script fails to scrape.
 - [ ] **Day 4:** custom alias (409 on clash); expiry (date + click cap → 410); Safe-Browsing rejects a
       bad URL; per-IP rate limit.
