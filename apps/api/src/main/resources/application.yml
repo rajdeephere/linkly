@@ -34,3 +34,7 @@ management:
 server:
   # 8081 keeps clear of Kafka UI (8080) and the Next.js web app (3000)
   port: 8081
+
+linkly:
+  # Origin used to build a link's short URL; in prod this is the branded/short domain.
+  base-url: ${LINKLY_BASE_URL:http://localhost:8081}
