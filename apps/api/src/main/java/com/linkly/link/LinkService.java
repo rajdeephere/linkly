@@ -16,41 +16,33 @@ public class LinkService {
     private static final UUID DEFAULT_WORKSPACE_ID =
             UUID.fromString("00000000-0000-0000-0000-000000000001");
 
-    private static final int MAX_CODE_ATTEMPTS = 5;
-
     private final LinkRepository links;
-    private final CodeGenerator codeGenerator;
+    private final KeyGenerationService kgs;
 
-    public LinkService(LinkRepository links, CodeGenerator codeGenerator) {
+    public LinkService(LinkRepository links, KeyGenerationService kgs) {
         this.links = links;
-        this.codeGenerator = codeGenerator;
+        this.kgs = kgs;
     }
 
     /**
-     * Create a short link for {@code destinationUrl}. Generates a unique code; the {@code (code)}
-     * unique index is the correctness guarantee, the retry loop handles the rare collision (and the
-     * even rarer concurrent-insert race, caught as a constraint violation).
+     * Create a short link for {@code destinationUrl}. The KGS hands out a code that is unique by
+     * construction (ADR-0002), so no pre-check or retry loop is needed on the hot path. The
+     * {@code (code)} unique index stays as a backstop; on the (should-never-happen) violation we claim
+     * one more code and retry once.
      */
     @Transactional
     public Link create(String destinationUrl, String title) {
-        for (int attempt = 0; attempt < MAX_CODE_ATTEMPTS; attempt++) {
-            String code = codeGenerator.generate();
-            if (links.existsByCode(code)) {
-                continue;
-            }
-            Link link = new Link();
-            link.setWorkspaceId(DEFAULT_WORKSPACE_ID);
-            link.setCode(code);
-            link.setDestinationUrl(destinationUrl);
-            link.setTitle(title);
-            try {
-                return links.saveAndFlush(link);
-            } catch (DataIntegrityViolationException race) {
-                // Another request claimed this code between existsByCode and flush — try again.
-            }
+        Link link = new Link();
+        link.setWorkspaceId(DEFAULT_WORKSPACE_ID);
+        link.setCode(kgs.claim());
+        link.setDestinationUrl(destinationUrl);
+        link.setTitle(title);
+        try {
+            return links.saveAndFlush(link);
+        } catch (DataIntegrityViolationException backstop) {
+            link.setCode(kgs.claim());
+            return links.saveAndFlush(link);
         }
-        throw new IllegalStateException(
-                "Could not generate a unique code after " + MAX_CODE_ATTEMPTS + " attempts");
     }
 
     /** Resolve a code to its link (the read hot path). */
