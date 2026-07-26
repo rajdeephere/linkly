@@ -17,9 +17,9 @@ export default async function Home() {
 
       <p className="text-xs text-muted-foreground">
         {status.ok
-          ? `API connected · ${status.seededLinks} links`
+          ? `API connected · ${status.links} links · KGS pool ${status.kgsPool}`
           : "API offline — start it in apps/api (./mvnw spring-boot:run)"}
-        {" · "}Day 2: shorten → 302 redirect
+        {" · "}Day 3: non-enumerable codes (KGS)
       </p>
     </main>
   );

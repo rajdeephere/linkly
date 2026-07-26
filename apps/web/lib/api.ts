@@ -4,7 +4,7 @@
 const API_BASE = process.env.API_URL ?? "http://localhost:8081";
 
 export type ApiStatus =
-  | { ok: true; app: string; status: string; seededLinks: number }
+  | { ok: true; app: string; status: string; links: number; kgsPool: number }
   | { ok: false };
 
 /** Hits GET /ping to confirm the API (and its DB connection) is alive. */
