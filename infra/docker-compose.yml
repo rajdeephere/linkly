@@ -35,6 +35,11 @@ services:
       - "6379:6379"
     volumes:
       - ./data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   clickhouse:
     image: clickhouse/clickhouse-server:24-alpine
@@ -81,3 +86,39 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     ports:
       - "8080:8080"
+
+  # ── Application services ──────────────────────────────────────────────
+  # Spring Boot management API + resolver (one service until the Phase-2 edge/origin split).
+  api:
+    build:
+      context: ../apps/api
+    container_name: linkly-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # In-network hostnames + container port 5432 (the 5433 host remap is only for host access).
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/linkly
+      POSTGRES_USER: linkly
+      POSTGRES_PASSWORD: linkly
+      REDIS_URL: redis://redis:6379
+      # Short-URL base — must be BROWSER-reachable, so the published host port.
+      LINKLY_BASE_URL: http://localhost:8081
+    ports:
+      - "8081:8081"
+
+  # Next.js web (dashboard + shorten bar). Proxies /api/* to the api service in-network.
+  web:
+    build:
+      context: ../apps/web
+      args:
+        API_URL: http://api:8081
+    container_name: linkly-web
+    depends_on:
+      - api
+    environment:
+      API_URL: http://api:8081
+    ports:
+      - "3000:3000"
