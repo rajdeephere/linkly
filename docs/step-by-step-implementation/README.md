@@ -19,14 +19,14 @@ filled in as we go (no speculative guesswork).
 **Implementation track**
 - [x] [01 — Day 1: monorepo scaffold + domain + boots-green](./implementation/01-day1-scaffold.md) ✅ full
 - [x] [02 — Day 2: shorten + 302 resolve + shorten bar](./implementation/02-day2-shorten-resolve.md) ✅ full
-- [ ] 03 — Day 3: KGS non-enumerable codes — outlined
+- [x] [03 — Day 3: KGS non-enumerable codes](./implementation/03-day3-kgs.md) ✅ full
 - [ ] 04 — Day 4: aliases, expiry, Safe-Browsing, rate limit — outlined
 - [ ] 05 — Day 5: edit/delete + Redis cache-aside + invalidation — outlined
 - [ ] 06+ — analytics, edge split, domains, routing, teams, flagship … — outlined per phase
 
 **Deployment track**
 - [x] [01 — Local docker dev (infra + api + web)](./deployment/01-local-docker-dev.md) ✅ full
-- [ ] 02 — Dockerize api + resolver + web (images) — outlined
+- [x] [02 — Dockerize api + web (full stack in compose)](./deployment/02-dockerize.md) ✅ full
 - [ ] 03 — Cloud (ECS/EKS) + edge (Cloudflare/Vercel) + CI/CD (GitHub Actions) — outlined
 - [ ] 04 — Observability (OTel → Prometheus/Grafana) — outlined
 

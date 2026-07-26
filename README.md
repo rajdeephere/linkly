@@ -90,24 +90,29 @@ linkly/
 
 ## 🚀 Getting started (local)
 
-> Application code is being scaffolded per the [roadmap](./docs/ROADMAP.md). For now you can bring up the backing services:
+**Everything in containers** — the whole stack (backing services + `api` + `web`) via one command:
 
 ```bash
-# 1. Start Postgres, Redis, ClickHouse, Kafka
-docker compose -f infra/docker-compose.yml up -d
-
-# 2. Copy env template
-cp .env.example .env    # then fill in secrets
-
-# 3. (soon) run the API + resolver + web
-#    cd apps/api && ./mvnw spring-boot:run
-#    cd apps/web && npm install && npm run dev
+docker compose -f infra/docker-compose.yml up -d --build
+# web → http://localhost:3000   ·   api → http://localhost:8081
 ```
 
-Local services once up:
+**Or, apps on the host** (faster inner loop while coding):
+
+```bash
+docker compose -f infra/docker-compose.yml up -d postgres redis   # backing services
+cd apps/api && ./mvnw spring-boot:run                             # API  → :8081
+cd apps/web && npm install && npm run dev                        # web  → :3000
+```
+
+See [`infra/README.md`](./infra/README.md) for both modes and the networking notes.
+
+Ports once up:
 
 | Service | URL |
 |---|---|
+| Web | http://localhost:3000 |
+| API | http://localhost:8081 |
 | Postgres | `localhost:5433` |
 | Redis | `localhost:6379` |
 | ClickHouse | `localhost:8123` (HTTP) |

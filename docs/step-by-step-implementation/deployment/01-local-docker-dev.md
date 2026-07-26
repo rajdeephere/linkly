@@ -27,13 +27,23 @@ docker compose -f infra/docker-compose.yml up -d postgres redis
 docker inspect -f '{{.State.Health.Status}}' linkly-postgres   # → healthy
 ```
 
-## Run the apps (host)
+## Run the apps
+
+Two modes — pick one (don't run both on the same ports):
+
+**Host mode** (fast inner loop for coding):
 ```bash
 # API — http://localhost:8081
 cd apps/api && ./mvnw -q -DskipTests spring-boot:run
 
 # Web — http://localhost:3000  (proxies /api/* → :8081)
 cd apps/web && npm install && npm run dev
+```
+
+**Full-stack containers** (`api` + `web` also in compose) — see
+[02-dockerize](./02-dockerize.md):
+```bash
+docker compose -f infra/docker-compose.yml up -d --build   # brings up EVERYTHING incl. api + web
 ```
 
 ## Verify
