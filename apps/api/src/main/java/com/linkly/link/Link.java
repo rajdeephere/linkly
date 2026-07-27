@@ -41,6 +41,10 @@ public class Link {
     @Column(name = "expires_at")
     private OffsetDateTime expiresAt;
 
+    /** Where to send visitors once the link is expired / click-capped; null → 410 Gone. */
+    @Column(name = "expires_url", length = 2048)
+    private String expiresUrl;
+
     @Column(name = "click_limit")
     private Long clickLimit;
 

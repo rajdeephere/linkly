@@ -38,3 +38,8 @@ server:
 linkly:
   # Origin used to build a link's short URL; in prod this is the branded/short domain.
   base-url: ${LINKLY_BASE_URL:http://localhost:8081}
+  rate-limit:
+    create-per-minute: ${LINKLY_RATE_LIMIT_CREATE_PER_MINUTE:20}
+  safe-browsing:
+    # false → StubUrlSafetyChecker (offline blocklist). true → real Google Safe Browsing (needs a key).
+    enabled: ${LINKLY_SAFE_BROWSING_ENABLED:false}

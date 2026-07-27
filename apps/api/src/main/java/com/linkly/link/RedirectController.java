@@ -29,11 +29,12 @@ public class RedirectController {
 
     @GetMapping("/{code:[0-9A-Za-z]+}")
     public ResponseEntity<Void> redirect(@PathVariable String code) {
-        return links.resolve(code)
-                .map(link -> ResponseEntity
-                        .status(HttpStatus.FOUND)
-                        .location(URI.create(link.getDestinationUrl()))
-                        .<Void>build())
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        ResolveOutcome outcome = links.resolve(code);
+        return switch (outcome.status()) {
+            case REDIRECT -> ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(outcome.url())).build();
+            case GONE -> ResponseEntity.status(HttpStatus.GONE).build();
+            case NOT_FOUND -> ResponseEntity.notFound().build();
+        };
     }
 }

@@ -11,6 +11,8 @@ public record LinkResponse(
         String shortUrl,
         String destinationUrl,
         String title,
+        OffsetDateTime expiresAt,
+        Long clickLimit,
         OffsetDateTime createdAt
 ) {
     public static LinkResponse from(Link link, String baseUrl) {
@@ -20,6 +22,8 @@ public record LinkResponse(
                 baseUrl + "/" + link.getCode(),
                 link.getDestinationUrl(),
                 link.getTitle(),
+                link.getExpiresAt(),
+                link.getClickLimit(),
                 link.getCreatedAt());
     }
 }
