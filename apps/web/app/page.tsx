@@ -19,7 +19,7 @@ export default async function Home() {
         {status.ok
           ? `API connected · ${status.links} links · KGS pool ${status.kgsPool}`
           : "API offline — start it in apps/api (./mvnw spring-boot:run)"}
-        {" · "}Day 3: non-enumerable codes (KGS)
+        {" · "}Day 4: aliases · expiry · safety · rate limits
       </p>
     </main>
   );
