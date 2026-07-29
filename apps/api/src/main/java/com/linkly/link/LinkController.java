@@ -4,11 +4,14 @@ import com.linkly.common.RateLimiter;
 import com.linkly.config.LinklyProperties;
 import com.linkly.link.dto.CreateLinkRequest;
 import com.linkly.link.dto.LinkResponse;
+import com.linkly.link.dto.UpdateLinkRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Duration;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +53,17 @@ public class LinkController {
         return links.findById(id)
                 .map(link -> LinkResponse.from(link, props.baseUrl()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "link not found"));
+    }
+
+    @PatchMapping("/{id}")
+    public LinkResponse update(@PathVariable String id, @Valid @RequestBody UpdateLinkRequest request) {
+        return LinkResponse.from(links.update(id, request), props.baseUrl());
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable String id) {
+        links.delete(id);
     }
 
     /** Best-effort client IP: first X-Forwarded-For hop (behind a proxy) else the socket address. */
