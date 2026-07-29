@@ -1,6 +1,6 @@
 # Phase 00 — Correct, safe shortener on one service
 
-**Status:** 🔨 in progress (Days 1–4 ✅ done) · **Roadmap:** Days 1–5
+**Status:** ✅ complete (Days 1–5) · **Roadmap:** Days 1–5
 
 ## Goal
 A **correct, safe, editable** shortener running on a **single** service: shorten → resolve (302),
@@ -30,8 +30,10 @@ Flyway-owned schema ([ADR-0012](../adr/0012-flyway-schema.md)); 302 not 301
 - [x] **Day 3:** KGS base62 codes — unique, non-sequential; an enumeration script fails to scrape (500 sequential probes → 0 of 200 real links).
 - [x] **Day 4:** custom alias (409 on clash); expiry (date + click cap → 410, or `expiresUrl` fallback);
       Safe-Browsing rejects a bad URL (422); per-IP rate limit (429). Click cap is a race-free atomic UPDATE.
-- [ ] **Day 5:** edit destination → next click hits the new URL immediately; delete → 404; Redis
-      cache-aside + purge.
+- [x] **Day 5:** edit destination → next click hits the new URL immediately; delete → 404; Redis
+      cache-aside + purge (verified: warm → PATCH purges → resolve serves NEW, not stale).
+
+**✅ Phase 0 complete** — a correct, safe, fast, editable shortener on one service.
 
 ## Maps to
 - ADRs: [0002 KGS](../adr/0002-kgs-base62-codes.md), [0005 302](../adr/0005-302-not-301.md),

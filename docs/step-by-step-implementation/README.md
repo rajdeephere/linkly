@@ -21,7 +21,7 @@ filled in as we go (no speculative guesswork).
 - [x] [02 — Day 2: shorten + 302 resolve + shorten bar](./implementation/02-day2-shorten-resolve.md) ✅ full
 - [x] [03 — Day 3: KGS non-enumerable codes](./implementation/03-day3-kgs.md) ✅ full
 - [x] [04 — Day 4: aliases, expiry, Safe-Browsing, rate limit](./implementation/04-day4-aliases-expiry-safety.md) ✅ full
-- [ ] 05 — Day 5: edit/delete + Redis cache-aside + invalidation — outlined
+- [x] [05 — Day 5: edit/delete + Redis cache-aside + invalidation](./implementation/05-day5-edit-delete-cache.md) ✅ full — **Phase 0 complete**
 - [ ] 06+ — analytics, edge split, domains, routing, teams, flagship … — outlined per phase
 
 **Deployment track**
