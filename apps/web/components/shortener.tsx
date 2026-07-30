@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 type LinkResponse = {
+  id: string;
   code: string;
   shortUrl: string;
   destinationUrl: string;
@@ -136,21 +138,29 @@ export function Shortener() {
       {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
 
       {result && (
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border bg-card p-4 text-card-foreground">
-          <a
-            href={result.shortUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="truncate font-mono text-sm text-blue-400 hover:underline"
+        <div className="mt-4 rounded-lg border bg-card p-4 text-card-foreground">
+          <div className="flex items-center justify-between gap-3">
+            <a
+              href={result.shortUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="truncate font-mono text-sm text-blue-400 hover:underline"
+            >
+              {result.shortUrl}
+            </a>
+            <button
+              onClick={copy}
+              className="shrink-0 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground"
+            >
+              {copied ? "Copied ✓" : "Copy"}
+            </button>
+          </div>
+          <Link
+            href={`/analytics/${result.id}`}
+            className="mt-2 inline-block text-xs text-muted-foreground hover:text-foreground"
           >
-            {result.shortUrl}
-          </a>
-          <button
-            onClick={copy}
-            className="shrink-0 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground"
-          >
-            {copied ? "Copied ✓" : "Copy"}
-          </button>
+            View analytics →
+          </Link>
         </div>
       )}
     </div>
