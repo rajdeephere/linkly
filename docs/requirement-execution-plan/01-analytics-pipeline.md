@@ -1,6 +1,6 @@
 # Phase 01 — Analytics off the hot path
 
-**Status:** 🔨 in progress (Day 6 ✅ done) · **Roadmap:** Days 6–7
+**Status:** ✅ complete (Days 6–7) · **Roadmap:** Days 6–7
 
 ## Goal
 Capture every click as rich, queryable analytics **without ever touching the redirect hot path**, and
@@ -24,7 +24,11 @@ Off the hot path ([ADR-0004](../adr/0004-analytics-off-hot-path.md)); store choi
 ## Done when
 - [x] **Day 6:** click event streamed (fire-and-forget) after redirect; consumer enriches (UA→device/os/
       browser, bot flag, hashed IP) + inserts to Postgres; **Kafka stopped → redirects still 302 in ~ms**.
-- [ ] **Day 7:** dashboard shows clicks-over-time, geo map, device/browser/referrer, top links.
+- [x] **Day 7:** `GET /v1/links/{id}/analytics` (totals + human/bot split + daily timeseries +
+      device/browser/country/referrer); dashboard renders it with a 7/30/90-day picker. *(Geo = Unknown
+      until edge-provided, Phase 2.)*
+
+**✅ Phase 1 complete** — clicks captured off the hot path and surfaced in a dashboard.
 
 ## Maps to
 - ADRs: [0004 analytics off hot path](../adr/0004-analytics-off-hot-path.md),

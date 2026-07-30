@@ -11,8 +11,9 @@ day ships, outlined before.
 | [04](./04-day4-aliases-expiry-safety.md) | 4 | Custom aliases, expiry, Safe-Browsing, rate limit | ✅ full |
 | [05](./05-day5-edit-delete-cache.md) | 5 | Edit/delete + Redis cache-aside + invalidation | ✅ full |
 | [06](./06-day6-analytics-pipeline.md) | 6 | Analytics pipeline — click events → Kafka → Postgres | ✅ full |
-| 07+ | 7+ | Analytics dashboard, edge split, domains, routing, teams, flagship | ⬜ outlined per phase |
+| [07](./07-day7-analytics-dashboard.md) | 7 | Analytics query API + dashboard | ✅ full |
+| 08+ | 8+ | Edge split, domains, routing, teams, flagship | ⬜ outlined per phase |
 
-**✅ Phase 0 complete** (Days 1–5). **Phase 1 in progress** — Day 6 ✅ (pipeline), Day 7 next (dashboard).
+**✅ Phase 0 complete** (Days 1–5). **✅ Phase 1 complete** (Days 6–7). Next: Phase 2 — read hot path at scale (edge + resolver split, Day 8).
 
 Companion: the **run/ship** track in [`../deployment/`](../deployment/).
