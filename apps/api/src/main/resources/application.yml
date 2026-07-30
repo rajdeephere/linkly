@@ -25,6 +25,23 @@ spring:
     redis:
       url: ${REDIS_URL:redis://localhost:6379}
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        # Don't let an unreachable broker stall the (async) emit for long.
+        max.block.ms: 2000
+    consumer:
+      group-id: linkly-analytics
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: com.linkly.analytics.ClickEventMessage
+        spring.json.trusted.packages: com.linkly.analytics
+
 management:
   endpoints:
     web:

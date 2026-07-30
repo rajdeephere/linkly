@@ -57,6 +57,12 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
+        <!-- Analytics event stream (Phase 1): fire-and-forget click events -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
         <!-- Ops -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

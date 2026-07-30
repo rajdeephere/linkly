@@ -1,5 +1,6 @@
 package com.linkly.link;
 
+import com.linkly.common.ClientIp;
 import com.linkly.common.RateLimiter;
 import com.linkly.config.LinklyProperties;
 import com.linkly.link.dto.CreateLinkRequest;
@@ -38,7 +39,7 @@ public class LinkController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public LinkResponse create(@Valid @RequestBody CreateLinkRequest request, HttpServletRequest http) {
-        String ip = clientIp(http);
+        String ip = ClientIp.of(http);
         if (!rateLimiter.allow("rl:create:" + ip,
                 props.rateLimit().createPerMinute(), Duration.ofMinutes(1))) {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
@@ -64,14 +65,5 @@ public class LinkController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String id) {
         links.delete(id);
-    }
-
-    /** Best-effort client IP: first X-Forwarded-For hop (behind a proxy) else the socket address. */
-    private static String clientIp(HttpServletRequest http) {
-        String xff = http.getHeader("X-Forwarded-For");
-        if (xff != null && !xff.isBlank()) {
-            return xff.split(",")[0].trim();
-        }
-        return http.getRemoteAddr();
     }
 }
