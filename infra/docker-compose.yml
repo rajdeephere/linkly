@@ -96,6 +96,21 @@ services:
     ports:
       - "8080:8080"
 
+  # SRH — serverless-redis-http: exposes linkly-redis over the Upstash HTTP protocol so the edge
+  # middleware's @vercel/kv client works locally (stands in for Vercel KV — no account needed).
+  srh:
+    image: hiett/serverless-redis-http:latest
+    container_name: linkly-srh
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: devtoken
+      SRH_CONNECTION_STRING: redis://redis:6379
+    ports:
+      - "8079:80"
+
   # ── Application services ──────────────────────────────────────────────
   # Spring Boot management API + resolver (one service until the Phase-2 edge/origin split).
   api:
