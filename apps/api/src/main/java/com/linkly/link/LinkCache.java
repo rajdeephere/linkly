@@ -33,6 +33,9 @@ public class LinkCache {
     }
 
     public void evict(String code) {
+        // Purge both the origin cache and the edge KV entry (ADR-0008 — the purge fans out to the edge).
+        // Locally the edge KV is the same Redis via SRH; in prod this would call the KV provider's API.
         redis.delete(PREFIX + code);
+        redis.delete("edge:" + PREFIX + code);
     }
 }

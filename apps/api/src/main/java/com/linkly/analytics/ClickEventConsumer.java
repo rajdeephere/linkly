@@ -26,7 +26,7 @@ public class ClickEventConsumer {
         this.userAgents = userAgents;
     }
 
-    @KafkaListener(topics = ClickEventPublisher.TOPIC, groupId = "linkly-analytics")
+    @KafkaListener(topics = AnalyticsConfig.CLICKS_TOPIC, groupId = "linkly-analytics")
     public void onClick(ClickEventMessage m) {
         UserAgentParser.Result ua = userAgents.parse(m.userAgent());
 
