@@ -14,7 +14,7 @@ in cache-invalidation bugs. Phases 0–1 are the *real* project; the rest is dep
 |-------|-------|------------------|--------------|--------|
 | [00](./00-correct-safe-shortener.md) | Correct, safe shortener on one service | non-enumerable codes, edit reflected instantly, bad URLs rejected | 1–5 | ✅ done |
 | [01](./01-analytics-pipeline.md) | Analytics off the hot path | consumer down → redirects still work; map + time-series dashboard | 6–7 | ✅ done |
-| [02](./02-read-hot-path-at-scale.md) | Read hot path at scale ⭐ | hot link <10ms from the edge; 100k req/s load test | 8–9 | ⬜ next |
+| [02](./02-read-hot-path-at-scale.md) | Read hot path at scale ⭐ | hot link <10ms from the edge; 100k req/s load test | 8–9 | 🔨 in progress (Day 8 ✅) |
 | [03](./03-domains-qr-routing.md) | Branded domains + QR + smart routing | `go.acme.com` over HTTPS; geo/device split; durable QR | 10–11 | ⬜ |
 | [04](./04-teams-api-flagship.md) | Teams/API/bulk + one flagship ⭐ | roles + API keys + bulk import; link-in-bio | 12–13 | ⬜ |
 | [05](./05-deploy-and-productize.md) | Deploy + harden + productize | live public URL; resolve trace; load-tested + documented | 14–15 | ⬜ |

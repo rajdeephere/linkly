@@ -1,6 +1,6 @@
 # Phase 02 — Read hot path at scale ⭐
 
-**Status:** ⬜ · **Roadmap:** Days 8–9
+**Status:** 🔨 in progress (Day 8 ✅ done) · **Roadmap:** Days 8–9
 
 ## Goal
 Make resolve **fast globally and viral-proof**: split the resolver from the management API, put hot
@@ -20,8 +20,9 @@ Resolver split ([ADR-0001](../adr/0001-resolver-separate-from-api.md)); hybrid e
 ([ADR-0003](../adr/0003-hybrid-edge-origin.md)); purge on edit ([ADR-0008](../adr/0008-cache-invalidation.md)).
 
 ## Done when
-- [ ] **Day 8:** resolver is its own deployable; a hot link resolves from the edge in **<10ms**; an
-      edit purges + re-warms correctly.
+- [x] **Day 8:** resolver is its own deployable (`apps/resolver`); hot links served from **edge KV**
+      (Vercel/Upstash via SRH locally) without touching origin; an edit **purges the edge** + re-warms.
+      *(The <10ms latency target is measured under Day 9's load test.)*
 - [ ] **Day 9:** load test sustains viral req/s at **p99 <10ms** with origin/Postgres cool behind the
       edge; origin-down drill degrades gracefully (no user-facing 5xx). Documented as a war-story.
 

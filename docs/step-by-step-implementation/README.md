@@ -24,7 +24,8 @@ filled in as we go (no speculative guesswork).
 - [x] [05 — Day 5: edit/delete + Redis cache-aside + invalidation](./implementation/05-day5-edit-delete-cache.md) ✅ full — **Phase 0 complete**
 - [x] [06 — Day 6: analytics pipeline (events → Kafka → Postgres)](./implementation/06-day6-analytics-pipeline.md) ✅ full — **Phase 1 begins**
 - [x] [07 — Day 7: analytics query API + dashboard](./implementation/07-day7-analytics-dashboard.md) ✅ full — **Phase 1 complete**
-- [ ] 08+ — edge split, domains, routing, teams, flagship … — outlined per phase
+- [x] [08 — Day 8: resolver split + edge (Vercel KV) hot path](./implementation/08-day8-edge-resolver-split.md) ✅ full — **Phase 2 begins**
+- [ ] 09+ — load test/resiliency, domains, routing, teams, flagship … — outlined per phase
 
 **Deployment track**
 - [x] [01 — Local docker dev (infra + api + web)](./deployment/01-local-docker-dev.md) ✅ full
