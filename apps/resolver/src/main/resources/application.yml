@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: linkly-resolver
+
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5433/linkly}
+    username: ${POSTGRES_USER:linkly}
+    password: ${POSTGRES_PASSWORD:linkly}
+
+  jpa:
+    hibernate:
+      # The management API owns the schema (Flyway); the resolver only reads/validates.
+      ddl-auto: validate
+    open-in-view: false
+
+  # Flyway lives in the api; the resolver never migrates.
+  flyway:
+    enabled: false
+
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        max.block.ms: 2000
+        # No type headers → the api consumer maps the JSON to its own ClickEventMessage (same fields).
+        spring.json.add.type.headers: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+server:
+  # api = 8081 · resolver = 8082 · web/edge = 3000
+  port: 8082
