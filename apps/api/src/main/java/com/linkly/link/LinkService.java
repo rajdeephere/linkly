@@ -1,5 +1,8 @@
 package com.linkly.link;
 
+import com.linkly.config.LinklyProperties;
+import com.linkly.domain.Domain;
+import com.linkly.domain.DomainRepository;
 import com.linkly.link.dto.CreateLinkRequest;
 import com.linkly.link.dto.UpdateLinkRequest;
 import java.time.OffsetDateTime;
@@ -25,19 +28,23 @@ public class LinkService {
     private final KeyGenerationService kgs;
     private final UrlSafetyChecker safety;
     private final LinkCache cache;
+    private final DomainRepository domains;
+    private final LinklyProperties props;
 
     public LinkService(LinkRepository links, KeyGenerationService kgs, UrlSafetyChecker safety,
-                       LinkCache cache) {
+                       LinkCache cache, DomainRepository domains, LinklyProperties props) {
         this.links = links;
         this.kgs = kgs;
         this.safety = safety;
         this.cache = cache;
+        this.domains = domains;
+        this.props = props;
     }
 
     /**
-     * Create a short link. Screens the destination for safety (ADR-0009), then either honours a custom
-     * alias (409 if taken) or claims a KGS code (unique by construction, ADR-0002). The {@code (code)}
-     * unique index backstops both against a concurrent-insert race.
+     * Create a short link. Screens the destination (ADR-0009), resolves the target domain (custom or
+     * the default), then honours a custom alias (409 if taken on that domain) or claims a KGS code.
+     * Uniqueness is per {@code (domain, code)} — the unique index backstops the race.
      */
     @Transactional
     public Link create(CreateLinkRequest req) {
@@ -45,9 +52,11 @@ public class LinkService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
                     "destination failed a safety check");
         }
+        Domain domain = resolveDomain(req.domainId());
 
         Link link = new Link();
         link.setWorkspaceId(DEFAULT_WORKSPACE_ID);
+        link.setDomainId(domain.getId());
         link.setDestinationUrl(req.destinationUrl());
         link.setTitle(req.title());
         link.setExpiresAt(req.expiresAt());
@@ -55,7 +64,7 @@ public class LinkService {
         link.setClickLimit(req.clickLimit());
 
         if (req.hasAlias()) {
-            if (links.existsByCode(req.alias())) {
+            if (links.existsByDomainIdAndCode(domain.getId(), req.alias())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "alias already taken");
             }
             link.setCode(req.alias());
@@ -75,51 +84,10 @@ public class LinkService {
         }
     }
 
-    /**
-     * Resolve a code: 302 to the destination, 410 (or fallback redirect) if expired / click-capped,
-     * or not-found. Plain links (no cap, no expiry) are served cache-aside from Redis; capped/expiring
-     * links always hit the DB because they carry per-request state (ADR-0008).
-     */
-    @Transactional
-    public ResolveOutcome resolve(String code) {
-        Optional<String> cached = cache.getDestination(code);
-        if (cached.isPresent()) {
-            return ResolveOutcome.redirect(cached.get());
-        }
-
-        Link link = links.findByCode(code).orElse(null);
-        if (link == null) {
-            return ResolveOutcome.notFound();
-        }
-        if (link.getExpiresAt() != null && OffsetDateTime.now().isAfter(link.getExpiresAt())) {
-            return expired(link);
-        }
-        if (link.getClickLimit() != null) {
-            if (links.tryIncrementClick(link.getId()) == 0) {
-                return expired(link); // click cap reached
-            }
-            return ResolveOutcome.redirect(link.getDestinationUrl()); // capped → never cached
-        }
-        if (link.getExpiresAt() != null) {
-            return ResolveOutcome.redirect(link.getDestinationUrl()); // time-limited → re-check each time
-        }
-
-        // Plain link — safe to cache.
-        cache.put(code, link.getDestinationUrl());
-        return ResolveOutcome.redirect(link.getDestinationUrl());
-    }
-
-    private ResolveOutcome expired(Link link) {
-        return link.getExpiresUrl() != null
-                ? ResolveOutcome.redirect(link.getExpiresUrl())
-                : ResolveOutcome.gone();
-    }
-
-    /** Edit a link, then purge its cache entry so the next resolve reflects the change immediately. */
+    /** Edit a link, then purge its (host-scoped) cache entry so the next resolve reflects it. */
     @Transactional
     public Link update(String id, UpdateLinkRequest req) {
-        Link link = findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "link not found"));
+        Link link = requireById(id);
         if (req.destinationUrl() != null) {
             if (!safety.isSafe(req.destinationUrl())) {
                 throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
@@ -141,17 +109,16 @@ public class LinkService {
         }
         link.setUpdatedAt(OffsetDateTime.now());
         Link saved = links.save(link);
-        cache.evict(saved.getCode());
+        cache.evict(hostnameOf(saved), saved.getCode());
         return saved;
     }
 
     /** Delete a link, then purge its cache entry (next resolve → 404). */
     @Transactional
     public void delete(String id) {
-        Link link = findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "link not found"));
+        Link link = requireById(id);
         links.delete(link);
-        cache.evict(link.getCode());
+        cache.evict(hostnameOf(link), link.getCode());
     }
 
     /** Look up a link by its id; empty (not an exception) for a malformed id. */
@@ -162,5 +129,44 @@ public class LinkService {
         } catch (IllegalArgumentException malformed) {
             return Optional.empty();
         }
+    }
+
+    /** Build a link's public short URL from its domain (default host uses the configured base URL). */
+    @Transactional(readOnly = true)
+    public String shortUrl(Link link) {
+        Domain domain = domains.findById(link.getDomainId()).orElse(null);
+        String base = (domain == null || domain.isDefault())
+                ? props.baseUrl()
+                : "https://" + domain.getHostname();
+        return base + "/" + link.getCode();
+    }
+
+    private Domain resolveDomain(String domainId) {
+        if (domainId == null || domainId.isBlank()) {
+            return domains.findById(Domain.DEFAULT_ID).orElseThrow(
+                    () -> new IllegalStateException("default domain missing"));
+        }
+        Domain domain;
+        try {
+            domain = domains.findById(UUID.fromString(domainId)).orElse(null);
+        } catch (IllegalArgumentException e) {
+            domain = null;
+        }
+        if (domain == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "domain not found");
+        }
+        if (!domain.isVerified()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "domain is not verified yet");
+        }
+        return domain;
+    }
+
+    private Link requireById(String id) {
+        return findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "link not found"));
+    }
+
+    private String hostnameOf(Link link) {
+        return domains.findById(link.getDomainId()).map(Domain::getHostname).orElse("");
     }
 }

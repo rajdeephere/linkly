@@ -29,6 +29,9 @@ public class Link {
     @Column(name = "workspace_id", nullable = false)
     private UUID workspaceId;
 
+    @Column(name = "domain_id", nullable = false)
+    private UUID domainId;
+
     @Column(nullable = false)
     private String code;
 

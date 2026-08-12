@@ -15,11 +15,11 @@ public record LinkResponse(
         Long clickLimit,
         OffsetDateTime createdAt
 ) {
-    public static LinkResponse from(Link link, String baseUrl) {
+    public static LinkResponse from(Link link, String shortUrl) {
         return new LinkResponse(
                 link.getId(),
                 link.getCode(),
-                baseUrl + "/" + link.getCode(),
+                shortUrl,
                 link.getDestinationUrl(),
                 link.getTitle(),
                 link.getExpiresAt(),

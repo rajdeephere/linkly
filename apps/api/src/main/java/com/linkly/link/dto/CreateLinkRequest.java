@@ -21,6 +21,9 @@ public record CreateLinkRequest(
         @Size(max = 255, message = "title must be at most 255 characters")
         String title,
 
+        /** Custom domain to create the link on; null → the default domain. */
+        String domainId,
+
         @Pattern(regexp = "^[0-9A-Za-z]{1,64}$",
                 message = "alias must be 1–64 base62 characters")
         String alias,

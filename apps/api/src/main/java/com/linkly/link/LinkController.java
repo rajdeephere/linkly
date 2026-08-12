@@ -46,19 +46,20 @@ public class LinkController {
                     "rate limit exceeded — try again shortly");
         }
         Link link = links.create(request);
-        return LinkResponse.from(link, props.baseUrl());
+        return LinkResponse.from(link, links.shortUrl(link));
     }
 
     @GetMapping("/{id}")
     public LinkResponse get(@PathVariable String id) {
         return links.findById(id)
-                .map(link -> LinkResponse.from(link, props.baseUrl()))
+                .map(link -> LinkResponse.from(link, links.shortUrl(link)))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "link not found"));
     }
 
     @PatchMapping("/{id}")
     public LinkResponse update(@PathVariable String id, @Valid @RequestBody UpdateLinkRequest request) {
-        return LinkResponse.from(links.update(id, request), props.baseUrl());
+        Link link = links.update(id, request);
+        return LinkResponse.from(link, links.shortUrl(link));
     }
 
     @DeleteMapping("/{id}")
