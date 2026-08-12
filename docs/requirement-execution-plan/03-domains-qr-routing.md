@@ -1,6 +1,6 @@
 # Phase 03 — Branded domains + QR + smart routing
 
-**Status:** ⬜ · **Roadmap:** Days 10–11
+**Status:** 🔨 in progress (Day 10 ✅ done) · **Roadmap:** Days 10–11
 
 ## Goal
 Ship the top marketable features: **branded custom domains** over HTTPS, **dynamic QR codes**, and
@@ -21,9 +21,11 @@ Custom domains ([ADR-0006](../adr/0006-custom-domains-tls.md)); routing
 ([ADR-0010](../adr/0010-smart-routing.md)).
 
 ## Done when
-- [ ] **Day 10:** point `go.acme.com` at Linkly → branded short links over HTTPS; QR generated + downloadable.
-- [ ] **Day 11:** one link sends iOS→App Store, Android→Play, else web; A-B returning-visitor stays on
-      the same variant; a QR survives a destination edit.
+- [x] **Day 10:** add `go.acme.com` → DNS-TXT verify → (simulated) per-host TLS → branded links; edge +
+      resolver route by `Host`; uniqueness `(domain, code)` (same code coexists across domains); host-scoped
+      cache + purge. *(TLS/DNS simulated locally; QR rebalanced to Day 11.)*
+- [ ] **Day 11:** dynamic QR per link (survives a destination edit); smart routing — one link sends
+      iOS→App Store, Android→Play, else web; A-B returning-visitor stays on the same variant.
 
 ## Maps to
 - ADRs: [0006 custom domains + TLS](../adr/0006-custom-domains-tls.md), [0010 smart routing](../adr/0010-smart-routing.md)

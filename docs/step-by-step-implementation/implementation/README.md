@@ -14,8 +14,9 @@ day ships, outlined before.
 | [07](./07-day7-analytics-dashboard.md) | 7 | Analytics query API + dashboard | ✅ full |
 | [08](./08-day8-edge-resolver-split.md) | 8 | Resolver split + edge (Vercel KV) hot path | ✅ full |
 | [09](./09-day9-load-test-resiliency.md) | 9 | Load test (k6) + origin-down resiliency | ✅ full |
-| 10+ | 10+ | Custom domains, QR, routing, teams, flagship | ⬜ outlined per phase |
+| [10](./10-day10-custom-domains.md) | 10 | Branded custom domains (DNS verify + per-host TLS + Host routing) | ✅ full |
+| 11+ | 11+ | QR codes, smart routing, teams, flagship | ⬜ outlined per phase |
 
-**✅ Phase 0 complete** (Days 1–5). **✅ Phase 1 complete** (Days 6–7). **✅ Phase 2 complete** (Days 8–9). Next: Phase 3 — branded domains + QR + smart routing (Day 10).
+**✅ Phase 0** (1–5) · **✅ Phase 1** (6–7) · **✅ Phase 2** (8–9). **Phase 3 in progress** — Day 10 ✅ (custom domains), Day 11 next (QR + smart routing).
 
 Companion: the **run/ship** track in [`../deployment/`](../deployment/).
