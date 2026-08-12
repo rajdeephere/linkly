@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface LinkRepository extends JpaRepository<Link, UUID> {
 
-    Optional<Link> findByCode(String code);
+    Optional<Link> findByDomainIdAndCode(UUID domainId, String code);
 
     /** Race-free click-cap: increments only while under the limit; 0 rows = capped. */
     @Modifying

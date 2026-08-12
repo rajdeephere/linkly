@@ -26,7 +26,7 @@ public class RedirectController {
 
     @GetMapping("/{code:[0-9A-Za-z]+}")
     public ResponseEntity<Void> redirect(@PathVariable String code, HttpServletRequest http) {
-        ResolveOutcome outcome = resolve.resolve(code);
+        ResolveOutcome outcome = resolve.resolve(code, http.getHeader("Host"));
 
         if (outcome.status() == ResolveOutcome.Status.REDIRECT) {
             clicks.publish(new ClickEventMessage(code, ClientIp.of(http),

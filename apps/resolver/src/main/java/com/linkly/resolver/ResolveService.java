@@ -4,26 +4,36 @@ import java.time.OffsetDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** The resolve decision: cache-aside → DB, with expiry + race-free click-cap (mirrors the api, Day 5). */
+/**
+ * The resolve decision, scoped by Host → domain → link (Day 10). Cache-aside → DB, with expiry +
+ * race-free click-cap. An unknown host resolves to nothing (can't serve on an unregistered domain).
+ */
 @Service
 public class ResolveService {
 
     private final LinkRepository links;
+    private final DomainRepository domains;
     private final LinkCache cache;
 
-    public ResolveService(LinkRepository links, LinkCache cache) {
+    public ResolveService(LinkRepository links, DomainRepository domains, LinkCache cache) {
         this.links = links;
+        this.domains = domains;
         this.cache = cache;
     }
 
     @Transactional
-    public ResolveOutcome resolve(String code) {
-        var cached = cache.getDestination(code);
+    public ResolveOutcome resolve(String code, String host) {
+        Domain domain = domains.findByHostname(host).orElse(null);
+        if (domain == null) {
+            return ResolveOutcome.notFound(); // request on an unregistered host
+        }
+
+        var cached = cache.getDestination(host, code);
         if (cached.isPresent()) {
             return ResolveOutcome.redirect(cached.get(), true);
         }
 
-        Link link = links.findByCode(code).orElse(null);
+        Link link = links.findByDomainIdAndCode(domain.getId(), code).orElse(null);
         if (link == null) {
             return ResolveOutcome.notFound();
         }
@@ -37,10 +47,10 @@ public class ResolveService {
             return ResolveOutcome.redirect(link.getDestinationUrl(), false); // capped → not cacheable
         }
         if (link.getExpiresAt() != null) {
-            return ResolveOutcome.redirect(link.getDestinationUrl(), false); // time-limited → not cacheable
+            return ResolveOutcome.redirect(link.getDestinationUrl(), false); // time-limited
         }
 
-        cache.put(code, link.getDestinationUrl());
+        cache.put(host, code, link.getDestinationUrl());
         return ResolveOutcome.redirect(link.getDestinationUrl(), true);
     }
 

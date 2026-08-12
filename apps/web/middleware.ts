@@ -24,6 +24,8 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
   const match = req.nextUrl.pathname.match(CODE);
   if (!match) return NextResponse.next();
   const code = match[1];
+  // The host the request came in on — selects the domain (uniqueness is per (domain, code)).
+  const host = req.headers.get("host") ?? "";
 
   const click = {
     code,
@@ -41,14 +43,14 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
     }).catch(() => {}),
   );
 
-  const key = `edge:link:${code}`;
+  const key = `edge:link:${host}:${code}`;
 
   const cached = await kv.get<string>(key).catch(() => null);
   if (cached) {
     return NextResponse.redirect(cached, 302);
   }
 
-  const res = await fetch(`${RESOLVER}/r/${code}`).catch(() => null);
+  const res = await fetch(`${RESOLVER}/r/${code}?host=${encodeURIComponent(host)}`).catch(() => null);
   if (!res || !res.ok) return new NextResponse(null, { status: 404 });
   const outcome = (await res.json()) as { status: string; url: string; cacheable: boolean };
 

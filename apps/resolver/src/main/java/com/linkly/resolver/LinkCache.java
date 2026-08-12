@@ -6,14 +6,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Origin-side cache-aside ({@code link:{code} → destinationUrl}). Shares the keyspace with the api's
- * LinkCache, so an api edit that purges {@code link:{code}} also clears the resolver's view. Only plain
- * links (no cap/expiry) are cached; the edge KV is a second layer in front of this (ADR-0003/0008).
+ * Origin-side cache-aside, host-scoped ({@code link:{host}:{code}}) since uniqueness is per
+ * (domain, code). The api purges these keys on edit; the edge KV is a second layer in front.
  */
 @Component
 public class LinkCache {
 
-    private static final String PREFIX = "link:";
     private static final Duration TTL = Duration.ofHours(1);
 
     private final StringRedisTemplate redis;
@@ -22,11 +20,15 @@ public class LinkCache {
         this.redis = redis;
     }
 
-    public Optional<String> getDestination(String code) {
-        return Optional.ofNullable(redis.opsForValue().get(PREFIX + code));
+    private static String key(String host, String code) {
+        return "link:" + host + ":" + code;
     }
 
-    public void put(String code, String destinationUrl) {
-        redis.opsForValue().set(PREFIX + code, destinationUrl, TTL);
+    public Optional<String> getDestination(String host, String code) {
+        return Optional.ofNullable(redis.opsForValue().get(key(host, code)));
+    }
+
+    public void put(String host, String code, String destinationUrl) {
+        redis.opsForValue().set(key(host, code), destinationUrl, TTL);
     }
 }
