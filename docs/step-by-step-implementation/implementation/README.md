@@ -15,8 +15,9 @@ day ships, outlined before.
 | [08](./08-day8-edge-resolver-split.md) | 8 | Resolver split + edge (Vercel KV) hot path | ✅ full |
 | [09](./09-day9-load-test-resiliency.md) | 9 | Load test (k6) + origin-down resiliency | ✅ full |
 | [10](./10-day10-custom-domains.md) | 10 | Branded custom domains (DNS verify + per-host TLS + Host routing) | ✅ full |
-| 11+ | 11+ | QR codes, smart routing, teams, flagship | ⬜ outlined per phase |
+| [11](./11-day11-qr-and-routing.md) | 11 | QR codes + smart routing (device/OS/geo + A-B) | ✅ full |
+| 12+ | 12+ | Teams/RBAC, API keys, bulk, flagship | ⬜ outlined per phase |
 
-**✅ Phase 0** (1–5) · **✅ Phase 1** (6–7) · **✅ Phase 2** (8–9). **Phase 3 in progress** — Day 10 ✅ (custom domains), Day 11 next (QR + smart routing).
+**✅ Phase 0** (1–5) · **✅ Phase 1** (6–7) · **✅ Phase 2** (8–9) · **✅ Phase 3** (10–11). Next: Phase 4 — teams/RBAC + API keys + bulk + a flagship (Day 12).
 
 Companion: the **run/ship** track in [`../deployment/`](../deployment/).

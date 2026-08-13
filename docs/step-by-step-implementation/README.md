@@ -27,7 +27,8 @@ filled in as we go (no speculative guesswork).
 - [x] [08 — Day 8: resolver split + edge (Vercel KV) hot path](./implementation/08-day8-edge-resolver-split.md) ✅ full — **Phase 2 begins**
 - [x] [09 — Day 9: load test (k6) + origin-down resiliency](./implementation/09-day9-load-test-resiliency.md) ✅ full — **Phase 2 complete**
 - [x] [10 — Day 10: branded custom domains](./implementation/10-day10-custom-domains.md) ✅ full — **Phase 3 begins**
-- [ ] 11+ — QR codes, smart routing, teams, flagship … — outlined per phase
+- [x] [11 — Day 11: QR codes + smart routing](./implementation/11-day11-qr-and-routing.md) ✅ full — **Phase 3 complete**
+- [ ] 12+ — teams/RBAC, API keys, bulk, flagship … — outlined per phase
 
 **Deployment track**
 - [x] [01 — Local docker dev (infra + api + web)](./deployment/01-local-docker-dev.md) ✅ full
