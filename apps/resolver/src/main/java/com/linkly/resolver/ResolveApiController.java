@@ -30,8 +30,12 @@ public class ResolveApiController {
     }
 
     @GetMapping("/r/{code:[0-9A-Za-z]+}")
-    public ResolveOutcome resolve(@PathVariable String code, @RequestParam String host) {
-        return resolve.resolve(code, host);
+    public ResolveOutcome resolve(@PathVariable String code,
+                                  @RequestParam String host,
+                                  @RequestParam(required = false) String ua,
+                                  @RequestParam(required = false) String country,
+                                  @RequestParam(required = false) String ip) {
+        return resolve.resolve(code, host, RoutingContext.from(ua, country, ip));
     }
 
     @PostMapping("/ingest/click")

@@ -50,7 +50,14 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
     return NextResponse.redirect(cached, 302);
   }
 
-  const res = await fetch(`${RESOLVER}/r/${code}?host=${encodeURIComponent(host)}`).catch(() => null);
+  // Forward the routing signals so the resolver can evaluate device/OS/geo/A-B rules (ADR-0010).
+  const params = new URLSearchParams({
+    host,
+    ua: click.userAgent,
+    country: click.country ?? "",
+    ip: click.ip,
+  });
+  const res = await fetch(`${RESOLVER}/r/${code}?${params}`).catch(() => null);
   if (!res || !res.ok) return new NextResponse(null, { status: 404 });
   const outcome = (await res.json()) as { status: string; url: string; cacheable: boolean };
 
