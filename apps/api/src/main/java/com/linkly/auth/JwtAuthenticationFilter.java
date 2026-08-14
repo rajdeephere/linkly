@@ -28,6 +28,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
+        // An earlier filter (API key) may already have authenticated — don't clobber it.
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            chain.doFilter(req, res);
+            return;
+        }
         String header = req.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             try {
