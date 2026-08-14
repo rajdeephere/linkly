@@ -4,6 +4,7 @@ import com.linkly.auth.AppUserPrincipal;
 import com.linkly.common.ClientIp;
 import com.linkly.common.RateLimiter;
 import com.linkly.config.LinklyProperties;
+import com.linkly.link.dto.BulkResult;
 import com.linkly.link.dto.CreateLinkRequest;
 import com.linkly.link.dto.LinkResponse;
 import com.linkly.link.dto.UpdateLinkRequest;
@@ -50,6 +51,12 @@ public class LinkController {
         }
         Link link = links.create(request, me.workspaceId());
         return LinkResponse.from(link, links.shortUrl(link));
+    }
+
+    /** Bulk-create from a CSV body (destinationUrl[,alias][,title] per row). Works with an API key. */
+    @PostMapping(value = "/bulk", consumes = {"text/csv", "text/plain"})
+    public BulkResult bulk(@RequestBody String csv, @AuthenticationPrincipal AppUserPrincipal me) {
+        return links.createBulk(csv, me.workspaceId());
     }
 
     @GetMapping

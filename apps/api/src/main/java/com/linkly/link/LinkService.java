@@ -3,9 +3,12 @@ package com.linkly.link;
 import com.linkly.config.LinklyProperties;
 import com.linkly.domain.Domain;
 import com.linkly.domain.DomainRepository;
+import com.linkly.link.dto.BulkResult;
+import com.linkly.link.dto.BulkResult.BulkError;
 import com.linkly.link.dto.CreateLinkRequest;
 import com.linkly.link.dto.UpdateLinkRequest;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +41,11 @@ public class LinkService {
 
     @Transactional
     public Link create(CreateLinkRequest req, UUID workspaceId) {
+        // Guard here too (not just the DTO's @Pattern) so bulk import can't smuggle in bad URLs.
+        if (req.destinationUrl() == null || !req.destinationUrl().matches("^https?://.+")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "destinationUrl must start with http:// or https://");
+        }
         if (!safety.isSafe(req.destinationUrl())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
                     "destination failed a safety check");
@@ -77,6 +85,47 @@ public class LinkService {
     @Transactional(readOnly = true)
     public List<Link> list(UUID workspaceId) {
         return links.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId);
+    }
+
+    private static final int BULK_MAX_ROWS = 1000;
+
+    /**
+     * Bulk-create from CSV ({@code destinationUrl[,alias][,title]} per row; optional header). Each row
+     * is created independently so one bad row doesn't fail the batch — NOT {@code @Transactional} on
+     * purpose (per-row isolation). Synchronous + capped; a queued job is the scale step.
+     */
+    public BulkResult createBulk(String csv, UUID workspaceId) {
+        String[] lines = csv == null ? new String[0] : csv.split("\\r?\\n");
+        List<BulkError> failed = new ArrayList<>();
+        int requested = 0;
+        int created = 0;
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+            if (i == 0 && line.toLowerCase().startsWith("destinationurl")) {
+                continue; // header row
+            }
+            if (requested >= BULK_MAX_ROWS) {
+                throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE,
+                        "bulk import is capped at " + BULK_MAX_ROWS + " rows");
+            }
+            requested++;
+            String[] cols = line.split(",", 3);
+            String url = cols[0].trim();
+            String alias = cols.length > 1 && !cols[1].isBlank() ? cols[1].trim() : null;
+            String title = cols.length > 2 && !cols[2].isBlank() ? cols[2].trim() : null;
+            try {
+                create(new CreateLinkRequest(url, title, null, alias, null, null, null), workspaceId);
+                created++;
+            } catch (ResponseStatusException e) {
+                failed.add(new BulkError(i + 1, e.getReason()));
+            } catch (RuntimeException e) {
+                failed.add(new BulkError(i + 1, e.getMessage()));
+            }
+        }
+        return new BulkResult(requested, created, failed);
     }
 
     @Transactional
