@@ -6,6 +6,7 @@ import com.linkly.domain.DomainRepository;
 import com.linkly.link.dto.CreateLinkRequest;
 import com.linkly.link.dto.UpdateLinkRequest;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,15 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+/** Link management, scoped to the caller's workspace (RBAC — Day 12). */
 @Service
 public class LinkService {
-
-    /**
-     * The seeded demo workspace (V1 migration). Real workspace resolution arrives with auth/teams
-     * (Phase 4); until then every link belongs here.
-     */
-    private static final UUID DEFAULT_WORKSPACE_ID =
-            UUID.fromString("00000000-0000-0000-0000-000000000001");
 
     private final LinkRepository links;
     private final KeyGenerationService kgs;
@@ -41,21 +36,16 @@ public class LinkService {
         this.props = props;
     }
 
-    /**
-     * Create a short link. Screens the destination (ADR-0009), resolves the target domain (custom or
-     * the default), then honours a custom alias (409 if taken on that domain) or claims a KGS code.
-     * Uniqueness is per {@code (domain, code)} — the unique index backstops the race.
-     */
     @Transactional
-    public Link create(CreateLinkRequest req) {
+    public Link create(CreateLinkRequest req, UUID workspaceId) {
         if (!safety.isSafe(req.destinationUrl())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
                     "destination failed a safety check");
         }
-        Domain domain = resolveDomain(req.domainId());
+        Domain domain = resolveDomain(req.domainId(), workspaceId);
 
         Link link = new Link();
-        link.setWorkspaceId(DEFAULT_WORKSPACE_ID);
+        link.setWorkspaceId(workspaceId);
         link.setDomainId(domain.getId());
         link.setDestinationUrl(req.destinationUrl());
         link.setTitle(req.title());
@@ -84,10 +74,14 @@ public class LinkService {
         }
     }
 
-    /** Edit a link, then purge its (host-scoped) cache entry so the next resolve reflects it. */
+    @Transactional(readOnly = true)
+    public List<Link> list(UUID workspaceId) {
+        return links.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId);
+    }
+
     @Transactional
-    public Link update(String id, UpdateLinkRequest req) {
-        Link link = requireById(id);
+    public Link update(String id, UUID workspaceId, UpdateLinkRequest req) {
+        Link link = require(id, workspaceId);
         if (req.destinationUrl() != null) {
             if (!safety.isSafe(req.destinationUrl())) {
                 throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
@@ -113,25 +107,23 @@ public class LinkService {
         return saved;
     }
 
-    /** Delete a link, then purge its cache entry (next resolve → 404). */
     @Transactional
-    public void delete(String id) {
-        Link link = requireById(id);
+    public void delete(String id, UUID workspaceId) {
+        Link link = require(id, workspaceId);
         links.delete(link);
         cache.evict(hostnameOf(link), link.getCode());
     }
 
-    /** Look up a link by its id; empty (not an exception) for a malformed id. */
+    /** Look up a link within a workspace; empty for a malformed id or a link in another workspace. */
     @Transactional(readOnly = true)
-    public Optional<Link> findById(String id) {
+    public Optional<Link> findById(String id, UUID workspaceId) {
         try {
-            return links.findById(UUID.fromString(id));
+            return links.findByIdAndWorkspaceId(UUID.fromString(id), workspaceId);
         } catch (IllegalArgumentException malformed) {
             return Optional.empty();
         }
     }
 
-    /** Build a link's public short URL from its domain (default host uses the configured base URL). */
     @Transactional(readOnly = true)
     public String shortUrl(Link link) {
         Domain domain = domains.findById(link.getDomainId()).orElse(null);
@@ -141,7 +133,7 @@ public class LinkService {
         return base + "/" + link.getCode();
     }
 
-    private Domain resolveDomain(String domainId) {
+    private Domain resolveDomain(String domainId, UUID workspaceId) {
         if (domainId == null || domainId.isBlank()) {
             return domains.findById(Domain.DEFAULT_ID).orElseThrow(
                     () -> new IllegalStateException("default domain missing"));
@@ -152,7 +144,7 @@ public class LinkService {
         } catch (IllegalArgumentException e) {
             domain = null;
         }
-        if (domain == null) {
+        if (domain == null || !domain.getWorkspaceId().equals(workspaceId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "domain not found");
         }
         if (!domain.isVerified()) {
@@ -161,8 +153,8 @@ public class LinkService {
         return domain;
     }
 
-    private Link requireById(String id) {
-        return findById(id).orElseThrow(
+    private Link require(String id, UUID workspaceId) {
+        return findById(id, workspaceId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "link not found"));
     }
 

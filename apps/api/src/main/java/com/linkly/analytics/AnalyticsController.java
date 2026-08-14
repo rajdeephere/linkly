@@ -1,6 +1,8 @@
 package com.linkly.analytics;
 
 import com.linkly.analytics.dto.AnalyticsResponse;
+import com.linkly.auth.AppUserPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +20,8 @@ public class AnalyticsController {
     /** Aggregated analytics for a link over the last {@code days} (default 30). */
     @GetMapping("/v1/links/{id}/analytics")
     public AnalyticsResponse analytics(@PathVariable String id,
-                                       @RequestParam(defaultValue = "30") int days) {
-        return analytics.forLink(id, days);
+                                       @RequestParam(defaultValue = "30") int days,
+                                       @AuthenticationPrincipal AppUserPrincipal me) {
+        return analytics.forLink(id, me.workspaceId(), days);
     }
 }

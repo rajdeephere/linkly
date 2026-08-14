@@ -32,8 +32,8 @@ public class RoutingService {
 
     /** Add a rule to a link, then purge its cache — a link with rules is no longer plain-cacheable. */
     @Transactional
-    public RuleResponse add(String linkId, CreateRuleRequest req) {
-        Link link = load(linkId);
+    public RuleResponse add(String linkId, UUID workspaceId, CreateRuleRequest req) {
+        Link link = load(linkId, workspaceId);
         if (("AB".equals(req.type())) == (req.matchValue() != null && !req.matchValue().isBlank())) {
             // matchValue is required for DEVICE/OS/GEO and must be absent for AB.
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -53,18 +53,19 @@ public class RoutingService {
     }
 
     @Transactional(readOnly = true)
-    public List<RuleResponse> list(String linkId) {
-        return rules.findByLinkId(load(linkId).getId()).stream().map(RuleResponse::from).toList();
+    public List<RuleResponse> list(String linkId, UUID workspaceId) {
+        return rules.findByLinkId(load(linkId, workspaceId).getId())
+                .stream().map(RuleResponse::from).toList();
     }
 
-    private Link load(String linkId) {
+    private Link load(String linkId, UUID workspaceId) {
         UUID uuid;
         try {
             uuid = UUID.fromString(linkId);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "link not found");
         }
-        return links.findById(uuid).orElseThrow(
+        return links.findByIdAndWorkspaceId(uuid, workspaceId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "link not found"));
     }
 

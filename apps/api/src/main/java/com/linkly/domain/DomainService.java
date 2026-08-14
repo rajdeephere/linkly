@@ -11,9 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class DomainService {
 
-    private static final UUID DEFAULT_WORKSPACE_ID =
-            UUID.fromString("00000000-0000-0000-0000-000000000001");
-
     private final DomainRepository domains;
     private final DnsVerifier dns;
 
@@ -22,15 +19,15 @@ public class DomainService {
         this.dns = dns;
     }
 
-    /** Register a domain: unverified, with a fresh ownership token and pending TLS. */
+    /** Register a domain in the caller's workspace: unverified, fresh token, pending TLS. */
     @Transactional
-    public DomainResponse add(CreateDomainRequest req) {
+    public DomainResponse add(CreateDomainRequest req, UUID workspaceId) {
         String hostname = req.hostname().toLowerCase();
         if (domains.existsByHostname(hostname)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "hostname already registered");
         }
         Domain d = new Domain();
-        d.setWorkspaceId(DEFAULT_WORKSPACE_ID);
+        d.setWorkspaceId(workspaceId);
         d.setHostname(hostname);
         d.setVerificationToken(UUID.randomUUID().toString().replace("-", ""));
         d.setTlsStatus("pending");
@@ -38,8 +35,8 @@ public class DomainService {
     }
 
     @Transactional(readOnly = true)
-    public DomainResponse get(String id) {
-        return toResponse(load(id));
+    public DomainResponse get(String id, UUID workspaceId) {
+        return toResponse(load(id, workspaceId));
     }
 
     /**
@@ -47,8 +44,8 @@ public class DomainService {
      * here: pending → active). On failure stay pending with a clear 400.
      */
     @Transactional
-    public DomainResponse verify(String id) {
-        Domain d = load(id);
+    public DomainResponse verify(String id, UUID workspaceId) {
+        Domain d = load(id, workspaceId);
         if (d.isVerified()) {
             return toResponse(d);
         }
@@ -64,22 +61,25 @@ public class DomainService {
 
     /** Dev-only: simulate the tenant publishing the DNS record (stands in for their DNS provider). */
     @Transactional(readOnly = true)
-    public void simulateDns(String id) {
-        Domain d = load(id);
+    public void simulateDns(String id, UUID workspaceId) {
+        Domain d = load(id, workspaceId);
         if (dns instanceof StubDnsVerifier stub) {
             stub.simulatePublish(d.getHostname(), d.getVerificationToken());
         }
     }
 
-    private Domain load(String id) {
+    private Domain load(String id, UUID workspaceId) {
         UUID uuid;
         try {
             uuid = UUID.fromString(id);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "domain not found");
         }
-        return domains.findById(uuid).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "domain not found"));
+        Domain d = domains.findById(uuid).orElse(null);
+        if (d == null || !d.getWorkspaceId().equals(workspaceId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "domain not found");
+        }
+        return d;
     }
 
     private DomainResponse toResponse(Domain d) {

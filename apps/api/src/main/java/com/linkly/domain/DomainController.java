@@ -1,9 +1,11 @@
 package com.linkly.domain;
 
+import com.linkly.auth.AppUserPrincipal;
 import com.linkly.domain.dto.CreateDomainRequest;
 import com.linkly.domain.dto.DomainResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,24 +26,25 @@ public class DomainController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public DomainResponse add(@Valid @RequestBody CreateDomainRequest request) {
-        return domains.add(request);
+    public DomainResponse add(@Valid @RequestBody CreateDomainRequest request,
+                              @AuthenticationPrincipal AppUserPrincipal me) {
+        return domains.add(request, me.workspaceId());
     }
 
     @GetMapping("/{id}")
-    public DomainResponse get(@PathVariable String id) {
-        return domains.get(id);
+    public DomainResponse get(@PathVariable String id, @AuthenticationPrincipal AppUserPrincipal me) {
+        return domains.get(id, me.workspaceId());
     }
 
     @PostMapping("/{id}/verify")
-    public DomainResponse verify(@PathVariable String id) {
-        return domains.verify(id);
+    public DomainResponse verify(@PathVariable String id, @AuthenticationPrincipal AppUserPrincipal me) {
+        return domains.verify(id, me.workspaceId());
     }
 
     /** Dev/simulation only — stands in for the tenant adding the TXT record at their DNS provider. */
     @PostMapping("/{id}/dns/simulate")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void simulateDns(@PathVariable String id) {
-        domains.simulateDns(id);
+    public void simulateDns(@PathVariable String id, @AuthenticationPrincipal AppUserPrincipal me) {
+        domains.simulateDns(id, me.workspaceId());
     }
 }

@@ -25,8 +25,8 @@ public class AnalyticsService {
     }
 
     @Transactional(readOnly = true)
-    public AnalyticsResponse forLink(String id, int days) {
-        Link link = links.findById(id).orElseThrow(
+    public AnalyticsResponse forLink(String id, java.util.UUID workspaceId, int days) {
+        Link link = links.findById(id, workspaceId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "link not found"));
         String code = link.getCode();
         OffsetDateTime since = OffsetDateTime.now().minusDays(Math.max(1, days));
