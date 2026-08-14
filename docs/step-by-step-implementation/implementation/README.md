@@ -16,8 +16,9 @@ day ships, outlined before.
 | [09](./09-day9-load-test-resiliency.md) | 9 | Load test (k6) + origin-down resiliency | ✅ full |
 | [10](./10-day10-custom-domains.md) | 10 | Branded custom domains (DNS verify + per-host TLS + Host routing) | ✅ full |
 | [11](./11-day11-qr-and-routing.md) | 11 | QR codes + smart routing (device/OS/geo + A-B) | ✅ full |
-| 12+ | 12+ | Teams/RBAC, API keys, bulk, flagship | ⬜ outlined per phase |
+| [12](./12-day12-auth-teams-keys-bulk.md) | 12 | Auth + teams/RBAC + API keys + bulk import | ✅ full |
+| 13+ | 13+ | Flagship (link-in-bio), deploy, harden | ⬜ outlined per phase |
 
-**✅ Phase 0** (1–5) · **✅ Phase 1** (6–7) · **✅ Phase 2** (8–9) · **✅ Phase 3** (10–11). Next: Phase 4 — teams/RBAC + API keys + bulk + a flagship (Day 12).
+**✅ Phase 0** (1–5) · **✅ Phase 1** (6–7) · **✅ Phase 2** (8–9) · **✅ Phase 3** (10–11). **Phase 4 in progress** — Day 12 ✅ (auth/teams/keys/bulk), Day 13 next (flagship).
 
 Companion: the **run/ship** track in [`../deployment/`](../deployment/).

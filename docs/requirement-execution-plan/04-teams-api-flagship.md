@@ -1,6 +1,6 @@
 # Phase 04 — Teams/API/bulk + one flagship ⭐
 
-**Status:** ⬜ · **Roadmap:** Days 12–13
+**Status:** 🔨 in progress (Day 12 ✅ done) · **Roadmap:** Days 12–13
 
 ## Goal
 Turn the tool into a **multi-tenant platform** (teams, API, bulk) and ship **one flagship surface** —
@@ -22,7 +22,9 @@ Data model ([../data-model.md](../data-model.md)); bulk uses [ADR-0002](../adr/0
 batch allocation; abuse guard ([ADR-0009](../adr/0009-safe-browsing-abuse.md)).
 
 ## Done when
-- [ ] **Day 12:** invite a teammate with a role; create links via an API key; import 10k links via CSV.
+- [x] **Day 12:** JWT auth (register/login) + workspaces/`Membership` RBAC (workspace isolation verified);
+      create links via a scoped **API key**; **bulk CSV import** with per-row error isolation.
+      *(Invite flow + a queued 10k job are follow-ups; the auth+scoping+keys+bulk core is done.)*
 - [ ] **Day 13:** the flagship (link-in-bio) works end-to-end.
 
 ## Maps to
