@@ -1,4 +1,4 @@
-package com.linkly.user;
+package com.linkly.workspace;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,28 +11,25 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * A person. Belongs to one or more workspaces via Membership (added later).
- * Table is named {@code app_user} because {@code user} is reserved in Postgres.
- */
+/** A user's role in a workspace (RBAC). Roles: owner | admin | member. */
 @Entity
-@Table(name = "app_user")
+@Table(name = "membership")
 @Getter
 @Setter
-public class User {
+public class Membership {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(name = "workspace_id", nullable = false)
+    private UUID workspaceId;
 
-    @Column
-    private String name;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
-    @Column(name = "password_hash")
-    private String passwordHash;
+    @Column(nullable = false)
+    private String role = "member";
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();

@@ -61,3 +61,7 @@ linkly:
   safe-browsing:
     # false → StubUrlSafetyChecker (offline blocklist). true → real Google Safe Browsing (needs a key).
     enabled: ${LINKLY_SAFE_BROWSING_ENABLED:false}
+  jwt:
+    # Base64 HS256 key (dev-only fallback). In prod: a secrets manager, never the repo.
+    secret: ${LINKLY_JWT_SECRET:ZGV2LW9ubHktc2VjcmV0LWNoYW5nZS1tZS1pbi1wcm9kdWN0aW9uLTEyMzQ1Ng==}
+    expiry-minutes: ${LINKLY_JWT_EXPIRY_MINUTES:60}
