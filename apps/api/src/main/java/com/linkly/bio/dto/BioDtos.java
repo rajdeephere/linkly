@@ -3,6 +3,7 @@ package com.linkly.bio.dto;
 import com.linkly.bio.BioBlock;
 import com.linkly.bio.BioPage;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.List;
@@ -35,6 +36,10 @@ public final class BioDtos {
             @NotBlank @Pattern(regexp = "^https?://.+",
                     message = "url must start with http:// or https://") String url,
             Integer position) {
+    }
+
+    /** The blocks of a page in their new display order. Must be a permutation of the page's blocks. */
+    public record ReorderBlocksRequest(@NotEmpty List<UUID> order) {
     }
 
     public record BlockResponse(UUID id, String label, String url, int position) {

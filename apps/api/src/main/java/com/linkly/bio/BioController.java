@@ -4,15 +4,18 @@ import com.linkly.auth.AppUserPrincipal;
 import com.linkly.bio.dto.BioDtos.AddBlockRequest;
 import com.linkly.bio.dto.BioDtos.BioResponse;
 import com.linkly.bio.dto.BioDtos.CreateBioRequest;
+import com.linkly.bio.dto.BioDtos.ReorderBlocksRequest;
 import com.linkly.bio.dto.BioDtos.UpdateBioRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -57,5 +60,18 @@ public class BioController {
     public BioResponse addBlock(@PathVariable String id, @Valid @RequestBody AddBlockRequest req,
                                 @AuthenticationPrincipal AppUserPrincipal me) {
         return bio.addBlock(id, me.workspaceId(), req);
+    }
+
+    @DeleteMapping("/{id}/blocks/{blockId}")
+    public BioResponse deleteBlock(@PathVariable String id, @PathVariable String blockId,
+                                   @AuthenticationPrincipal AppUserPrincipal me) {
+        return bio.deleteBlock(id, me.workspaceId(), blockId);
+    }
+
+    @PutMapping("/{id}/blocks/order")
+    public BioResponse reorderBlocks(@PathVariable String id,
+                                     @Valid @RequestBody ReorderBlocksRequest req,
+                                     @AuthenticationPrincipal AppUserPrincipal me) {
+        return bio.reorder(id, me.workspaceId(), req.order());
     }
 }

@@ -5,8 +5,11 @@ import com.linkly.bio.dto.BioDtos.BioResponse;
 import com.linkly.bio.dto.BioDtos.CreateBioRequest;
 import com.linkly.bio.dto.BioDtos.UpdateBioRequest;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,6 +87,41 @@ public class BioService {
         return response(p);
     }
 
+    /** Remove a block, then compact the survivors to positions 0..n-1 so there are no gaps. */
+    @Transactional
+    public BioResponse deleteBlock(String id, UUID workspaceId, String blockId) {
+        BioPage p = require(id, workspaceId);
+        BioBlock target = requireBlock(blockId, p.getId());
+        blocks.delete(target);
+        List<BioBlock> remaining = blocks.findByBioPageIdOrderByPositionAsc(p.getId());
+        for (int i = 0; i < remaining.size(); i++) {
+            remaining.get(i).setPosition(i);
+        }
+        blocks.saveAll(remaining);
+        return response(p);
+    }
+
+    /**
+     * Reorder a page's blocks. The request must be a permutation of exactly the page's current blocks —
+     * reject anything else so the UI can't drop or smuggle in a block. New position = index in the list.
+     */
+    @Transactional
+    public BioResponse reorder(String id, UUID workspaceId, List<UUID> order) {
+        BioPage p = require(id, workspaceId);
+        List<BioBlock> current = blocks.findByBioPageIdOrderByPositionAsc(p.getId());
+        Map<UUID, BioBlock> byId = current.stream()
+                .collect(Collectors.toMap(BioBlock::getId, b -> b));
+        if (order.size() != current.size() || !byId.keySet().equals(new HashSet<>(order))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "order must be a permutation of this page's blocks");
+        }
+        for (int i = 0; i < order.size(); i++) {
+            byId.get(order.get(i)).setPosition(i);
+        }
+        blocks.saveAll(byId.values());
+        return response(p);
+    }
+
     /** Public view by slug — no workspace scoping (this is the hosted page). */
     @Transactional(readOnly = true)
     public BioResponse publicBySlug(String slug) {
@@ -101,6 +139,21 @@ public class BioService {
         }
         return pages.findByIdAndWorkspaceId(uuid, workspaceId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "page not found"));
+    }
+
+    /** Load a block and confirm it belongs to this page (never leak another page's block). */
+    private BioBlock requireBlock(String blockId, UUID bioPageId) {
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(blockId);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "block not found");
+        }
+        BioBlock b = blocks.findById(uuid).orElse(null);
+        if (b == null || !b.getBioPageId().equals(bioPageId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "block not found");
+        }
+        return b;
     }
 
     private BioResponse response(BioPage p) {
