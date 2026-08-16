@@ -1,6 +1,6 @@
 # Phase 04 — Teams/API/bulk + one flagship ⭐
 
-**Status:** 🔨 in progress (Day 12 ✅ done) · **Roadmap:** Days 12–13
+**Status:** ✅ complete (Days 12–13) · **Roadmap:** Days 12–13
 
 ## Goal
 Turn the tool into a **multi-tenant platform** (teams, API, bulk) and ship **one flagship surface** —
@@ -25,7 +25,10 @@ batch allocation; abuse guard ([ADR-0009](../adr/0009-safe-browsing-abuse.md)).
 - [x] **Day 12:** JWT auth (register/login) + workspaces/`Membership` RBAC (workspace isolation verified);
       create links via a scoped **API key**; **bulk CSV import** with per-row error isolation.
       *(Invite flow + a queued 10k job are follow-ups; the auth+scoping+keys+bulk core is done.)*
-- [ ] **Day 13:** the flagship (link-in-bio) works end-to-end.
+- [x] **Day 13:** link-in-bio — workspace-scoped management + a public server-rendered `/bio/{slug}`
+      page with themed blocks (verified: create, blocks, public JSON, hosted render, slug clash 409).
+
+**✅ Phase 4 complete** — multi-tenant platform (auth, RBAC, API keys, bulk) + the link-in-bio flagship.
 
 ## Maps to
 - ADRs: [0002 KGS batch](../adr/0002-kgs-base62-codes.md), [0009 abuse](../adr/0009-safe-browsing-abuse.md)

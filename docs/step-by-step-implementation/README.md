@@ -29,7 +29,8 @@ filled in as we go (no speculative guesswork).
 - [x] [10 — Day 10: branded custom domains](./implementation/10-day10-custom-domains.md) ✅ full — **Phase 3 begins**
 - [x] [11 — Day 11: QR codes + smart routing](./implementation/11-day11-qr-and-routing.md) ✅ full — **Phase 3 complete**
 - [x] [12 — Day 12: auth + teams/RBAC + API keys + bulk](./implementation/12-day12-auth-teams-keys-bulk.md) ✅ full — **Phase 4 begins**
-- [ ] 13+ — flagship (link-in-bio), deploy, harden … — outlined per phase
+- [x] [13 — Day 13: link-in-bio flagship](./implementation/13-day13-link-in-bio.md) ✅ full — **Phase 4 complete**
+- [ ] 14+ — deploy (cloud/CI-CD), harden, observability … — outlined per phase
 
 **Deployment track**
 - [x] [01 — Local docker dev (infra + api + web)](./deployment/01-local-docker-dev.md) ✅ full

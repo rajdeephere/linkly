@@ -16,8 +16,8 @@ in cache-invalidation bugs. Phases 0–1 are the *real* project; the rest is dep
 | [01](./01-analytics-pipeline.md) | Analytics off the hot path | consumer down → redirects still work; map + time-series dashboard | 6–7 | ✅ done |
 | [02](./02-read-hot-path-at-scale.md) | Read hot path at scale ⭐ | hot link <10ms from the edge; 100k req/s load test | 8–9 | ✅ done |
 | [03](./03-domains-qr-routing.md) | Branded domains + QR + smart routing | `go.acme.com` over HTTPS; geo/device split; durable QR | 10–11 | ✅ done |
-| [04](./04-teams-api-flagship.md) | Teams/API/bulk + one flagship ⭐ | roles + API keys + bulk import; link-in-bio | 12–13 | 🔨 in progress (Day 12 ✅) |
-| [05](./05-deploy-and-productize.md) | Deploy + harden + productize | live public URL; resolve trace; load-tested + documented | 14–15 | ⬜ |
+| [04](./04-teams-api-flagship.md) | Teams/API/bulk + one flagship ⭐ | roles + API keys + bulk import; link-in-bio | 12–13 | ✅ done |
+| [05](./05-deploy-and-productize.md) | Deploy + harden + productize | live public URL; resolve trace; load-tested + documented | 14–15 | ⬜ next |
 
 ## How to read a phase doc
 Each has: **Goal · Scope (in/out) · Architecture delta · Done-when checklist · Maps to (days/ADRs)**.

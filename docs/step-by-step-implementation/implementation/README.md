@@ -17,8 +17,9 @@ day ships, outlined before.
 | [10](./10-day10-custom-domains.md) | 10 | Branded custom domains (DNS verify + per-host TLS + Host routing) | ✅ full |
 | [11](./11-day11-qr-and-routing.md) | 11 | QR codes + smart routing (device/OS/geo + A-B) | ✅ full |
 | [12](./12-day12-auth-teams-keys-bulk.md) | 12 | Auth + teams/RBAC + API keys + bulk import | ✅ full |
-| 13+ | 13+ | Flagship (link-in-bio), deploy, harden | ⬜ outlined per phase |
+| [13](./13-day13-link-in-bio.md) | 13 | Link-in-bio flagship (hosted page + blocks) | ✅ full |
+| 14+ | 14+ | Deploy (cloud/CI-CD), harden, observability | ⬜ outlined per phase |
 
-**✅ Phase 0** (1–5) · **✅ Phase 1** (6–7) · **✅ Phase 2** (8–9) · **✅ Phase 3** (10–11). **Phase 4 in progress** — Day 12 ✅ (auth/teams/keys/bulk), Day 13 next (flagship).
+**✅ Phase 0** (1–5) · **✅ Phase 1** (6–7) · **✅ Phase 2** (8–9) · **✅ Phase 3** (10–11) · **✅ Phase 4** (12–13). Next: Phase 5 — deploy + harden + productize (Days 14–15).
 
 Companion: the **run/ship** track in [`../deployment/`](../deployment/).
