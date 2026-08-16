@@ -14,6 +14,10 @@ const RESOLVER = process.env.RESOLVER_URL ?? "http://localhost:8082";
 const CODE = /^\/([0-9A-Za-z]{1,64})$/;
 const EDGE_TTL = 3600; // seconds — a backstop; edits purge the key explicitly (ADR-0008)
 
+// First-path segments owned by the app's own UI. A short code shaped like one of these must never be
+// shadowed by the edge resolver (and, conversely, KGS/aliases must never mint one). See war-story.
+const RESERVED = new Set(["login", "register", "dashboard", "bio", "analytics", "api"]);
+
 /**
  * Edge resolver (ADR-0003). Fronts `/{code}`:
  *  - always fire-and-forget the click to the resolver's /ingest (analytics survives a cache hit)
@@ -24,6 +28,8 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
   const match = req.nextUrl.pathname.match(CODE);
   if (!match) return NextResponse.next();
   const code = match[1];
+  // Let the app's own routes (login/dashboard/…) render instead of resolving them as short codes.
+  if (RESERVED.has(code.toLowerCase())) return NextResponse.next();
   // The host the request came in on — selects the domain (uniqueness is per (domain, code)).
   const host = req.headers.get("host") ?? "";
 
