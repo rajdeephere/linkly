@@ -1,6 +1,7 @@
 "use client";
 
 import { BarList, ColumnChart, StatTile, type Bucket, type Point } from "@/components/analytics";
+import { api } from "@/lib/auth";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -28,7 +29,7 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/v1/links/${params.id}/analytics?days=${days}`)
+    api(`/v1/links/${params.id}/analytics?days=${days}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d: Analytics) => setData(d))
       .catch(() => setError("Couldn't load analytics for this link."))
@@ -39,8 +40,8 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
     <main className="mx-auto max-w-4xl p-6 md:p-10">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Linkly
+          <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
+            ← Links
           </Link>
           <h1 className="mt-1 text-2xl font-semibold">
             Analytics{data ? <span className="font-mono text-muted-foreground"> · /{data.code}</span> : ""}
