@@ -4,6 +4,7 @@ import com.linkly.auth.AppUserPrincipal;
 import com.linkly.domain.dto.CreateDomainRequest;
 import com.linkly.domain.dto.DomainResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +30,11 @@ public class DomainController {
     public DomainResponse add(@Valid @RequestBody CreateDomainRequest request,
                               @AuthenticationPrincipal AppUserPrincipal me) {
         return domains.add(request, me.workspaceId());
+    }
+
+    @GetMapping
+    public List<DomainResponse> list(@AuthenticationPrincipal AppUserPrincipal me) {
+        return domains.list(me.workspaceId());
     }
 
     @GetMapping("/{id}")

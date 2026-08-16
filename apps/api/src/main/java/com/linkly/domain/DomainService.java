@@ -2,6 +2,7 @@ package com.linkly.domain;
 
 import com.linkly.domain.dto.CreateDomainRequest;
 import com.linkly.domain.dto.DomainResponse;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,13 @@ public class DomainService {
     @Transactional(readOnly = true)
     public DomainResponse get(String id, UUID workspaceId) {
         return toResponse(load(id, workspaceId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<DomainResponse> list(UUID workspaceId) {
+        return domains.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     /**
