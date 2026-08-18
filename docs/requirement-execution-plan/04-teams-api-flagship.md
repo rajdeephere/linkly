@@ -27,8 +27,14 @@ batch allocation; abuse guard ([ADR-0009](../adr/0009-safe-browsing-abuse.md)).
       *(Invite flow + a queued 10k job are follow-ups; the auth+scoping+keys+bulk core is done.)*
 - [x] **Day 13:** link-in-bio — workspace-scoped management + a public server-rendered `/bio/{slug}`
       page with themed blocks (verified: create, blocks, public JSON, hosted render, slug clash 409).
+- [x] **Frontend catch-up:** the full authed web dashboard — login/register, a guarded nav, and pages for
+      links (create/copy/QR/analytics/delete), custom domains (add→verify), API keys (shown once), and the
+      bio editor. Closes the earlier "web login UI deferred" gap. Bio blocks became fully editable from the
+      UI: `DELETE .../blocks/{blockId}` (deletes + compacts positions to `0..n-1`) and
+      `PUT .../blocks/order` (permutation-guarded reorder). Also added `GET /v1/domains` (list).
 
-**✅ Phase 4 complete** — multi-tenant platform (auth, RBAC, API keys, bulk) + the link-in-bio flagship.
+**✅ Phase 4 complete** — multi-tenant platform (auth, RBAC, API keys, bulk) + the link-in-bio flagship,
+now fully usable in the browser end-to-end.
 
 ## Maps to
 - ADRs: [0002 KGS batch](../adr/0002-kgs-base62-codes.md), [0009 abuse](../adr/0009-safe-browsing-abuse.md)
